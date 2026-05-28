@@ -1,0 +1,32 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  durability-gate:
+    name: Durability gate (SIGKILL)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - run: uv sync --group dev
+      - run: uv run python -m pytest tests/durability -v -m durability
+
+  test:
+    needs: durability-gate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - run: uv sync --group dev
+      - uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - run: uv run ruff check packages tests examples
+      - run: uv run python -m pytest tests packages -v --ignore=tests/durability
+      - name: Credibility gates (fixed-point, offline, tool safety, divergence, recorder SIGKILL)
+        run: uv run python -m pytest tests/test_credibility_gates.py -v

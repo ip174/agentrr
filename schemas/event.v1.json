@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "required": ["event_id", "run_id", "seq", "type", "status"],
+  "properties": {
+    "event_id": { "type": "string" },
+    "run_id": { "type": "string" },
+    "seq": { "type": "integer" },
+    "type": { "type": "string" },
+    "status": { "type": "string" },
+    "integrity": { "type": "string" }
+  }
+}

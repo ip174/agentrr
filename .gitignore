@@ -1,0 +1,17 @@
+.venv/
+__pycache__/
+**/__pycache__/
+*.pyc
+.agentrr/
+**/.agentrr/
+.agentreplay/
+**/.agentreplay/
+*.jsonl
+*.jsonl.idx
+.benchmarks/
+dist/
+*.egg-info/
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+uv.lock

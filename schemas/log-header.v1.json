@@ -1,0 +1,10 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "required": ["kind", "log_format_version", "run_id"],
+  "properties": {
+    "kind": { "const": "header" },
+    "log_format_version": { "type": "string" },
+    "run_id": { "type": "string" }
+  }
+}

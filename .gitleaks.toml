@@ -1,0 +1,14 @@
+title = "agentrr gitleaks config"
+
+[extend]
+useDefault = true
+
+[allowlist]
+paths = [
+  '''\.venv/''',
+  '''\.pytest_cache/''',
+  '''\.mypy_cache/''',
+  '''\.ruff_cache/''',
+  '''\.agentrr/''',
+  '''\.agentreplay/''',
+]
