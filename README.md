@@ -31,13 +31,13 @@ Replay it — deterministically, with no network and no live LLM calls (the demo
 uv run agentrr replay deterministic_support-<id> agents.deterministic_support:main
 ```
 
-Now edit the agent's prompt and replay again. agentrr halts at the **exact** boundary where behavior first diverges, with a signature mismatch and a structural diff in the divergence report:
+Now edit the agent's prompt and replay again. agentrr halts at the **exact** boundary where behavior first diverges:
 
 ```
 DivergenceError: divergence at seq 5: signature mismatch
 ```
 
-Strict mode halts on the first mismatch; use `mode="observe"` to continue and collect every divergence. The report includes structural diff previews (`expected_preview` / `observed_preview`), not the error string alone.
+Strict mode halts on the first mismatch; use `mode="observe"` to continue and collect every divergence. The engine also records structural diff previews (`expected_preview` / `observed_preview`) in the divergence report for that boundary.
 
 That's the core loop: turn a one-time, irreproducible failure into a fixed artifact you can re-enter and dissect.
 
@@ -66,10 +66,15 @@ Matching is **sequence-primary, signature-validated** — no fuzzy search, ever.
 
 ## Install
 
-From source (PyPI publish pending):
+```bash
+pip install agentrr
+agentrr version
+```
+
+### Development (from source)
 
 ```bash
-git clone https://github.com/<OWNER>/agentrr.git
+git clone https://github.com/ip174/agentrr.git
 cd agentrr
 uv sync --group dev
 export PYTHONPATH=examples   # for example agents
