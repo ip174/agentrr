@@ -18,3 +18,5 @@ jobs:
       - uses: pypa/gh-action-pypi-publish@release/v1
         with:
           packages-dir: dist
+          # Tag re-pushes (e.g. after moving v0.1.0a1) must not fail if version exists.
+          skip-existing: true
