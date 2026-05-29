@@ -1,0 +1,49 @@
+[project]
+name = "agentrr-ui"
+version = "0.1.0a2"
+description = "Visual stepper UI for agentrr record-and-replay"
+readme = "README.md"
+license = "Apache-2.0"
+requires-python = ">=3.11"
+keywords = ["ai", "agents", "replay", "ui", "debugging"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Environment :: Web Environment",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Software Development :: Testing",
+]
+dependencies = [
+    "agentrr>=0.1.0a2",
+    "fastapi>=0.115",
+    "uvicorn[standard]>=0.32",
+    "websockets>=13.0",
+]
+
+[project.scripts]
+agentrr-ui = "agentrr_ui.server:main"
+agentrr-replay-worker = "agentrr_ui.worker:main"
+
+[project.urls]
+Homepage = "https://github.com/ip174/agentrr"
+Documentation = "https://github.com/ip174/agentrr/blob/main/docs/ui.md"
+Repository = "https://github.com/ip174/agentrr"
+Issues = "https://github.com/ip174/agentrr/issues"
+Changelog = "https://github.com/ip174/agentrr/blob/main/CHANGELOG.md"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/agentrr_ui"]
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "/README.md",
+    "/src/agentrr_ui",
+]

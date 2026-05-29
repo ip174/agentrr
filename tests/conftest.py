@@ -13,6 +13,7 @@ for p in (
     ROOT / "packages" / "agentrr-sdk" / "src",
     ROOT / "packages" / "agentrr-replay" / "src",
     ROOT / "packages" / "agentrr-cli" / "src",
+    ROOT / "packages" / "agentrr-ui" / "src",
     EXAMPLES,
 ):
     s = str(p)

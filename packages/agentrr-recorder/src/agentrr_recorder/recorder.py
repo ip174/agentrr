@@ -8,6 +8,7 @@ from datetime import UTC, datetime
 from typing import Any
 
 from agentrr_core.integrity import compute_integrity
+from agentrr_core.log.run_index import upsert_run_index
 from agentrr_core.log.writer import LogWriter
 from agentrr_core.schema.events import ErrorPayload, Event, EventStatus, EventType, RunHeader
 from agentrr_core.signature import request_signature
@@ -57,6 +58,13 @@ class Recorder:
             )
             self._active = False
             self._writer.finalize_index()
+            upsert_run_index(
+                self._writer.path,
+                run_id=self._run_id,
+                entrypoint=self._header.entrypoint,
+                truncated=False,
+                event_count=self._seq + 1,
+            )
 
     def record_boundary(
         self,

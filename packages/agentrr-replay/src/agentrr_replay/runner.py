@@ -26,12 +26,15 @@ class ReplayRunner:
         *,
         mode: ReplayMode = ReplayMode.STRICT,
         entrypoint_fingerprint: str | None = None,
+        forced_entrypoint: bool = False,
     ) -> None:
         self._engine = DeterminismEngine.load(
             log_path,
             mode=mode,
             observed_fingerprint=entrypoint_fingerprint,
         )
+        if forced_entrypoint:
+            self._engine.report.forced_entrypoint = True
 
     @property
     def engine(self) -> DeterminismEngine:

@@ -14,7 +14,20 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v5
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Build agentrr-ui frontend
+        run: |
+          cd packages/agentrr-ui/frontend
+          npm ci
+          npm run build
       - run: uv build
+      - run: uv build packages/agentrr-ui
+      - name: Collect wheels for PyPI
+        run: |
+          cp packages/agentrr-ui/dist/* dist/
+          ls -la dist/
       - uses: pypa/gh-action-pypi-publish@release/v1
         with:
           packages-dir: dist

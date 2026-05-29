@@ -15,3 +15,8 @@ dist/
 .ruff_cache/
 .pytest_cache/
 uv.lock
+node_modules/
+packages/agentrr-ui/frontend/node_modules/
+packages/agentrr-ui/frontend/tsconfig.tsbuildinfo
+packages/agentrr-ui/dist/
+packages/agentrr-ui/.venv/

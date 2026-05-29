@@ -37,6 +37,7 @@ class RunHeader(BaseModel):
     run_id: str
     sdk_version: str = "0.1.0"
     agent_code_fingerprint: str | None = None
+    entrypoint: str | None = None
     clock_origin: dict[str, Any] | None = None
     rng_seed_origin: dict[str, Any] | None = None
     initial_input: dict[str, Any] | None = None

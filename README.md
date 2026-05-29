@@ -8,16 +8,34 @@ agentrr records every nondeterministic boundary an agent crosses — every LLM c
 
 It's `rr` / time-travel debugging, for AI agents.
 
-## The 60-second demo
+## Install (PyPI)
 
-From a clone of this repo:
+Alpha releases on [PyPI](https://pypi.org/):
 
 ```bash
+pip install agentrr
+agentrr version
+```
+
+Optional local web UI:
+
+```bash
+pip install agentrr-ui
+agentrr-ui   # http://127.0.0.1:8765 — see docs/ui.md
+```
+
+## Quick start (from source)
+
+```bash
+git clone https://github.com/ip174/agentrr.git
+cd agentrr
 uv sync --group dev
 export PYTHONPATH=examples
 ```
 
-Record a run:
+### 1. Record a run
+
+Use `python -m …` so the log stores a stable entrypoint for replay:
 
 ```bash
 uv run python -m agents.deterministic_support
@@ -25,21 +43,36 @@ uv run python -m agents.deterministic_support
 # log: .agentrr/runs/deterministic_support-<id>.jsonl
 ```
 
-Replay it — deterministically, with no network and no live LLM calls (the demo agent uses a mock client; replay never calls it):
+### 2. Replay in the CLI
 
 ```bash
-uv run agentrr replay deterministic_support-<id> agents.deterministic_support:main
+uv run agentrr replay deterministic_support-<id>
 ```
 
-Now edit the agent's prompt and replay again. agentrr halts at the **exact** boundary where behavior first diverges:
+Entrypoint is read from the log header (`0.1.0a2+`); override only when needed.
+
+Edit the agent and replay again — strict mode stops at the first divergence:
 
 ```
 DivergenceError: divergence at seq 5: signature mismatch
 ```
 
-Strict mode halts on the first mismatch; use `mode="observe"` to continue and collect every divergence. The engine also records structural diff previews (`expected_preview` / `observed_preview`) in the divergence report for that boundary.
+### 3. Inspect in the web UI (optional)
 
-That's the core loop: turn a one-time, irreproducible failure into a fixed artifact you can re-enter and dissect.
+```bash
+# dev checkout: install UI + built frontend
+cd packages/agentrr-ui/frontend && npm ci && npm run build
+cd ../../..
+uv pip install -e . -e packages/agentrr-ui
+
+export PYTHONPATH=examples
+export AGENTRR_LOG_DIR=.agentrr/runs   # optional; this is the default
+agentrr-ui
+```
+
+Open http://127.0.0.1:8765 — pick a session, read **What happened**, then **Check replay** and **Next** to step through AI/tool steps. **Replay matched** means today's run followed the same path as the recording.
+
+See [docs/ui.md](docs/ui.md) for security, nginx, and troubleshooting.
 
 ## What it guarantees
 
@@ -50,11 +83,9 @@ That's the core loop: turn a one-time, irreproducible failure into a fixed artif
 
 ## What it does NOT do (by design)
 
-Single-process, synchronous agents. No marketplace, no backend, no GUI. Concurrency, streaming-chunk replay, and multi-agent pipelines are out of scope for v0.1. See [docs/contract.md](docs/contract.md) for the full contract and exclusions.
+Single-process, synchronous agents. No marketplace, no backend, no hosted service. Concurrency, streaming-chunk replay, and multi-agent pipelines are out of scope for v0.1. See [docs/contract.md](docs/contract.md).
 
 ## How it works
-
-agentrr intercepts at the boundaries where an agent touches nondeterminism, and freezes them on replay:
 
 | Layer | Recorded | Served on replay |
 |-------|----------|------------------|
@@ -62,31 +93,18 @@ agentrr intercepts at the boundaries where an agent touches nondeterminism, and 
 | Tool calls | name, args, return/error | recorded result (tool never runs) |
 | Clock / RNG / IDs | every read and draw | recorded values, in order |
 
-Matching is **sequence-primary, signature-validated** — no fuzzy search, ever. A request that doesn't match the next expected event is divergence, not a thing to paper over.
-
-## Install
-
-```bash
-pip install agentrr
-agentrr version
-```
-
-### Development (from source)
-
-```bash
-git clone https://github.com/ip174/agentrr.git
-cd agentrr
-uv sync --group dev
-export PYTHONPATH=examples   # for example agents
-```
+Matching is **sequence-primary, signature-validated** — no fuzzy search. A request that doesn't match the next expected event is divergence.
 
 ## Development
 
 ```bash
 uv sync --group dev
-make test          # full suite incl. credibility gates
+export PYTHONPATH=examples
+make test          # full suite (excludes durability subdir by default in Makefile)
 make durability    # SIGKILL write-before-return gate
-gitleaks detect    # secret scan before you push
+make ui-build      # compile React → agentrr_ui/static/
+make lint
+gitleaks detect    # before you push
 ```
 
 ### Reference agents
@@ -96,7 +114,17 @@ gitleaks detect    # secret scan before you push
 | `examples/agents/deterministic_support.py` | Golden path (mock LLM, registered tools, shims) |
 | `examples/agents/unstable_loop.py` | Unwrapped `random` — diverges on replay (by design) |
 | `examples/agents/tool_caller.py` | LLM → tool → LLM loop |
-| `examples/agents/broken_replay_cases.py` | Negative scenarios (edited prompt, missing tool, truncated/corrupt log) |
+| `examples/agents/broken_replay_cases.py` | Negative scenarios |
+
+### Docs
+
+| Doc | Topic |
+|-----|--------|
+| [docs/ui.md](docs/ui.md) | Web UI install and run |
+| [docs/RELEASING.md](docs/RELEASING.md) | PyPI release checklist |
+| [docs/contract.md](docs/contract.md) | Guarantees and exclusions |
+| [docs/replay-worker-protocol.md](docs/replay-worker-protocol.md) | UI worker IPC |
+| [CONTRIBUTING.md](CONTRIBUTING.md) | Contributor workflow |
 
 ## License
 

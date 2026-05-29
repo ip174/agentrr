@@ -11,6 +11,7 @@ from agentrr_replay.modes import ReplayMode
 from agentrr_replay.runner import ReplayRunner, code_fingerprint
 
 from agentrr_sdk import runtime
+from agentrr_sdk.entrypoint import resolve_entrypoint_for_replay
 from agentrr_sdk.init import init_replay, shutdown_replay
 from agentrr_sdk.record import default_log_dir
 
@@ -27,22 +28,29 @@ def resolve_log_path(run_id: str) -> Path:
 
 def replay(
     run_id: str | Path,
-    entrypoint: Callable[..., Any],
+    entrypoint: Callable[..., Any] | None = None,
     *args: Any,
     mode: str = "strict",
+    entrypoint_spec: str | None = None,
     **kwargs: Any,
 ) -> Any:
     log_path = resolve_log_path(str(run_id)) if not isinstance(run_id, Path) else run_id
+    resolved, forced_entrypoint = resolve_entrypoint_for_replay(
+        log_path,
+        entrypoint,
+        entrypoint_spec=entrypoint_spec,
+    )
     replay_mode = ReplayMode.OBSERVE if mode == "observe" else ReplayMode.STRICT
     runner = ReplayRunner(
         log_path,
         mode=replay_mode,
-        entrypoint_fingerprint=code_fingerprint(entrypoint),
+        entrypoint_fingerprint=code_fingerprint(resolved),
+        forced_entrypoint=forced_entrypoint,
     )
     init_replay(runner.engine)
     runtime.set_mode("replay")
     try:
-        return entrypoint(*args, **kwargs)
+        return resolved(*args, **kwargs)
     except (DivergenceError, LogExhaustedError):
         raise
     finally:

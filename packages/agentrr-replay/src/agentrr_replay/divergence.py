@@ -27,6 +27,7 @@ class DivergenceReport:
     halted: bool = True
     divergences: list[DivergenceRecord] = field(default_factory=list)
     fingerprint_mismatch: bool = False
+    forced_entrypoint: bool = False
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -34,6 +35,7 @@ class DivergenceReport:
             "run_id": self.run_id,
             "halted": self.halted,
             "fingerprint_mismatch": self.fingerprint_mismatch,
+            "forced_entrypoint": self.forced_entrypoint,
             "divergences": [
                 {
                     "seq": d.seq,

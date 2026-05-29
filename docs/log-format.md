@@ -1,6 +1,6 @@
 # Log format v1.0
 
-- Line 0: header (`kind: header`, `log_format_version: "1.0"`, `run_id`, fingerprints).
+- Line 0: header (`kind: header`, `log_format_version: "1.0"`, `run_id`, fingerprints, optional `entrypoint` e.g. `agents.deterministic_support:main`).
 - Lines 1..N: events with monotonic `seq`, `type`, `request`, `response`/`error`, `integrity`.
 
 ## Fsync policy

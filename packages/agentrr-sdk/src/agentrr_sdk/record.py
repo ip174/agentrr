@@ -16,6 +16,7 @@ from agentrr_core.version import __version__
 from agentrr_recorder.recorder import Recorder
 
 from agentrr_sdk import runtime
+from agentrr_sdk.entrypoint import format_entrypoint
 from agentrr_sdk.init import shutdown_replay
 
 
@@ -46,6 +47,7 @@ def record(
         run_id=run_id,
         sdk_version=__version__,
         agent_code_fingerprint=code_fingerprint(entrypoint),
+        entrypoint=format_entrypoint(entrypoint),
         initial_input=initial_input,
         clock_origin={"wall": None},
         rng_seed_origin={},

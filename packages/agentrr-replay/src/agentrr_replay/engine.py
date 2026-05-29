@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from pathlib import Path
 from typing import Any
 
@@ -27,6 +28,7 @@ class DeterminismEngine:
         self._reader = reader
         self._mode = mode
         self._cursors = TypeCursors(reader.events)
+        self.boundary_callback: Callable[[Event], None] | None = None
         self._report = DivergenceReport(
             run_id=reader.header.run_id,
             fingerprint_mismatch=False,
@@ -80,7 +82,12 @@ class DeterminismEngine:
             if self._mode == ReplayMode.STRICT:
                 raise DivergenceError(f"divergence at seq {expected.seq}: signature mismatch")
         self._cursors.advance(event_type)
+        self._notify_boundary(expected)
         return expected
+
+    def _notify_boundary(self, event: Event) -> None:
+        if self.boundary_callback is not None:
+            self.boundary_callback(event)
 
     def serve_llm(self, request: dict[str, Any]) -> dict[str, Any]:
         ev = self._match(EventType.LLM_CALL, request)

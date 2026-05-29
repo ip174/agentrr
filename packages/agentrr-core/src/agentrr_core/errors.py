@@ -32,3 +32,20 @@ class LogExhaustedError(AgentRrError):
 
 class DivergenceError(AgentRrError):
     """Strict-mode halt on boundary mismatch."""
+
+
+class PauseAtBoundary(AgentRrError):
+    """Step replay paused after serving a boundary (worker IPC)."""
+
+    def __init__(
+        self,
+        seq: int,
+        event_type: str,
+        request: dict,
+        response: dict | None,
+    ) -> None:
+        self.seq = seq
+        self.event_type = event_type
+        self.request = request
+        self.response = response
+        super().__init__(f"pause at seq {seq} ({event_type})")

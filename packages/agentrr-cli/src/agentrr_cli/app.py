@@ -9,8 +9,9 @@ import typer
 from agentrr_core.log.reader import LogReader
 from agentrr_core.validate import validate_log
 from agentrr_core.version import __version__
-from agentrr_sdk import replay as replay_mod
 from agentrr_sdk.record import record as sdk_record
+from agentrr_sdk.replay import replay as replay_fn
+from agentrr_sdk.replay import resolve_log_path
 from rich.console import Console
 from rich.json import JSON
 from rich.table import Table
@@ -20,7 +21,7 @@ console = Console()
 
 
 def _resolve(run_id: str) -> Path:
-    return replay_mod.resolve_log_path(run_id)
+    return resolve_log_path(run_id)
 
 
 @app.command()
@@ -86,23 +87,30 @@ def record_cmd(
 @app.command("replay")
 def replay_cmd(
     run_id: str = typer.Argument(...),
-    module: str = typer.Argument(..., help="module.path:callable"),
+    module: str | None = typer.Argument(
+        None,
+        help="module.path:callable (optional if stored in log header)",
+    ),
     strict: bool = typer.Option(True, "--strict/--observe"),
     until_seq: int | None = typer.Option(None, "--until-seq"),
 ) -> None:
     import importlib
 
-    mod_name, _, fn_name = module.partition(":")
-    mod = importlib.import_module(mod_name)
-    entry = getattr(mod, fn_name)
     mode = "strict" if strict else "observe"
+    entry = None
+    if module is not None:
+        mod_name, _, fn_name = module.partition(":")
+        entry = getattr(importlib.import_module(mod_name), fn_name)
     if until_seq is not None:
+        if entry is None:
+            typer.secho("module required with --until-seq", fg=typer.colors.RED)
+            raise typer.Exit(1)
         from agentrr_cli.session import ReplaySession
 
         session = ReplaySession(_resolve(run_id), mode=mode)
         session.run_until_seq(entry, until_seq)
     else:
-        replay_mod.replay(run_id, entry, mode=mode)
+        replay_fn(run_id, entry, mode=mode)
         typer.secho("Replay complete", fg=typer.colors.GREEN)
 
 
