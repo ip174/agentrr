@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.1.0a3] - 2026-05-28
+
+### Changed
+
+- Expanded `agentrr-ui` PyPI README: install, quick start, troubleshooting, nginx, security.
+
 ## [0.1.0a2] - 2026-05-28
 
 ### Added

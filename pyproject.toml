@@ -1,6 +1,6 @@
 [project]
 name = "agentrr"
-version = "0.1.0a2"
+version = "0.1.0a3"
 description = "Deterministic record-and-replay debugger for AI agent runs"
 readme = "README.md"
 license = "Apache-2.0"

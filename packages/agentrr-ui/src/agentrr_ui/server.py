@@ -18,7 +18,7 @@ from fastapi.responses import FileResponse
 from agentrr_ui.log_store import format_mtime, list_runs
 from agentrr_ui.sessions import SessionManager
 
-app = FastAPI(title="agentrr-ui", version="0.1.0a2")
+app = FastAPI(title="agentrr-ui", version="0.1.0a3")
 sessions = SessionManager()
 
 STATIC_DIR = Path(__file__).parent / "static"
